@@ -38,10 +38,10 @@ public class UtilisateurController {
     UtilisateurService utilisateurService;
 
     @PostMapping("/utilisateurs/login")
-    public String generateJwtToken(@ModelAttribute("UtilisateurDTO") UtilisateurDTO utilisateurDto) throws JsonProcessingException {
+    public String generateJwtToken(@ModelAttribute("utilisateurDto") UtilisateurDTO utilisateurDto) throws JsonProcessingException {
         try {
             Authentication authentication = authManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(utilisateurDto.getNomUtilisateur(), utilisateurDto.getMotDePasse()));
+                    new UsernamePasswordAuthenticationToken(utilisateurDto.getNomUtilisateur().trim(), utilisateurDto.getMotDePasse().trim()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
             UserDetails userDetails = utilisateurService.loadUserByUsername(utilisateurDto.getNomUtilisateur());
             Map<String, Object> map = new HashMap<>();
@@ -49,17 +49,21 @@ public class UtilisateurController {
             map.put("Status", HttpStatus.OK);
             return getString(map);
         } catch (Exception e) {
-            return generateErrorResponse("Username or password are invalidate", HttpStatus.BAD_REQUEST);
+            return generateErrorResponse("Username: "+utilisateurDto.getNomUtilisateur()+" or password: "+utilisateurDto.getMotDePasse()+" are invalidate", HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping("/utilisateurs/registration")
     public String registerUser(@ModelAttribute("UtilisateurDTO") UtilisateurDTO utilisateurDto) throws JsonProcessingException {
-        Utilisateur users = utilisateurService.save(utilisateurDto);
-        if (users == null)
-            return generateResponse("Not able to save user ", HttpStatus.BAD_REQUEST, utilisateurDto);
-        else
-            return generateResponse("User saved successfully : " + users.getUtilisateurId(), HttpStatus.OK, users);
+        try {
+            Utilisateur users = utilisateurService.save(utilisateurDto);
+            if (users == null)
+                return generateResponse("Not able to save user ", HttpStatus.BAD_REQUEST, utilisateurDto);
+            else
+                return generateResponse("User saved successfully : " + users.getUtilisateurId(), HttpStatus.OK, users);
+        } catch (Exception e) {
+            return generateResponse("Error: ", HttpStatus.BAD_REQUEST, e);
+        }
     }
 
     @PostMapping("/api/logout")

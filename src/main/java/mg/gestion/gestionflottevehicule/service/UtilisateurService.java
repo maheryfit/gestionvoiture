@@ -37,7 +37,7 @@ public class UtilisateurService implements UserDetailsService {
     @Autowired
     private RoleRepository roleRepository;
 
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
     @Override
     public UserDetails loadUserByUsername(String nomUtilisateur) throws UsernameNotFoundException {
@@ -61,7 +61,7 @@ public class UtilisateurService implements UserDetailsService {
         Utilisateur user = new Utilisateur();
         user.setEmail(userRegisteredDTO.getEmail());
         user.setNomUtilisateur(userRegisteredDTO.getNomUtilisateur());
-        user.setMotDePasse(userRegisteredDTO.getMotDePasse());
+        user.setMotDePasse(bCryptPasswordEncoder.encode(userRegisteredDTO.getMotDePasse()));
         user.setRole(role);
         return utilisateurRepository.save(user);
     }
