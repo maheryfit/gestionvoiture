@@ -65,8 +65,10 @@ public class SecurityConfig {
 		http
 				.authenticationProvider(authenticationProvider())
 				.authorizeHttpRequests(auth -> auth
-						.requestMatchers("/marques/**", "/societes/**", "/utilisateurs/**").permitAll()
-						.anyRequest().authenticated())
+						.requestMatchers("/marques/**", "/societes/**", "/utilisateurs/**")
+						.permitAll()
+						.anyRequest()
+						.authenticated())
 				.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class)
 				.csrf(AbstractHttpConfigurer::disable)
 				.exceptionHandling(exceptionHandler -> exceptionHandler
@@ -74,7 +76,6 @@ public class SecurityConfig {
 				)
 				.cors(AbstractHttpConfigurer::disable)
 				.sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
 		return http.build();
 	}
 
